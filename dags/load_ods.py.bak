@@ -1,0 +1,52 @@
+from airflow import DAG
+from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.providers.postgres.hooks.postgres import PostgresHook
+from airflow.utils.dates import days_ago
+from datetime import timedelta
+
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
+
+dag = DAG(
+    'etl_4_source_to_ods_transfer',
+    default_args=default_args,
+    description='Перегрузка сырых данных в слой ODS',
+    schedule_interval=timedelta(days=1),
+    start_date=days_ago(1),
+    catchup=False,
+)
+
+create_ods_table = PostgresOperator(
+    task_id='create_ods_table',
+    postgres_conn_id='source_conn',
+    sql='''
+    ''',
+    dag=dag,
+)
+
+def transfer_data():
+    source_hook = PostgresHook(postgres_conn_id='source_conn')
+    target_hook = PostgresHook(postgres_conn_id='etl_db_4_conn')
+
+    query = "SELECT * FROM source_table"
+    records = source_hook.get_records(query)
+
+    for record in records:
+        target_hook.run(
+            "INSERT INTO ods_table (id, data) VALUES (%s, %s)",
+            parameters=(record[0], record[1]),
+        )
+
+transfer_data_task = PythonOperator(
+    task_id='transfer_data',
+    python_callable=transfer_data,
+    dag=dag,
+)
+
+create_ods_table >> transfer_data_task
