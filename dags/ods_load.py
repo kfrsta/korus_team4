@@ -4,7 +4,6 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.utils.dates import days_ago
 from datetime import timedelta
 from airflow.operators.python_operator import PythonOperator
-from ods_init import get_tables
 
 
 default_args = {
@@ -12,30 +11,41 @@ default_args = {
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
-    'retry_delay': timedelta(minutes=5),
+    'retries': 0
 }
 
 dag = DAG(
-    'load_data_to_ods',
+    'ods_load',
     default_args=default_args,
     description='Load data to ODS schema',
-    schedule_interval=timedelta(days=1),
+    schedule_interval="@daily",
     start_date=days_ago(1),
     catchup=False,
 )
 
 
+def get_tables():
+    source_hook = PostgresHook(postgres_conn_id='source_conn')
+    query = """
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'source_data'
+        AND table_type = 'BASE TABLE';
+    """
+    records = source_hook.get_records(query)
+    return [record[0] for record in records]
+
+
 def load_data_to_ods():
-    source_hook = PostgresHook(postgres_conn_id='source_postgres')
-    target_hook = PostgresHook(postgres_conn_id='target_postgres')
+    source_hook = PostgresHook(postgres_conn_id='source_conn')
+    target_hook = PostgresHook(postgres_conn_id='etl_db_4_conn')
 
     tables = get_tables()
 
     for table in tables:
-        select_query = f"SELECT * FROM public.{table}"
+        select_query = f"SELECT * FROM source.source_data.{table}"
         records = source_hook.get_records(select_query)
-        target_hook.insert_rows(f'ods.{table}', rows=records)
+        target_hook.insert_rows(f'etl_db_4.ods.{table}', rows=records)
 
 
 load_data_to_ods_task = PythonOperator(

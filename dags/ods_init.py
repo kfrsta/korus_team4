@@ -1,62 +1,82 @@
 from airflow import DAG
-from airflow.providers.postgres.operators.postgres import PostgresOperator
-from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
-from datetime import timedelta
+from airflow.hooks.postgres_hook import PostgresHook
 
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
-    'retry_delay': timedelta(minutes=5),
+    'retries': 0,
 }
 
-dag = DAG(
-    'create_ods_schema_and_tables',
-    default_args=default_args,
-    description='Create ODS schema and tables based on source schema',
-    schedule_interval=None,
-    start_date=days_ago(1),
-    catchup=False,
-)
 
+def copy_schema(source_conn_id, target_conn_id):
+    source_hook = PostgresHook(postgres_conn_id=source_conn_id)
+    target_hook = PostgresHook(postgres_conn_id=target_conn_id)
 
-def get_tables():
-    source_hook = PostgresHook(postgres_conn_id='source_conn')
-    query = """
+    source_conn = source_hook.get_conn()
+    target_conn = target_hook.get_conn()
+
+    source_cursor = source_conn.cursor()
+    target_cursor = target_conn.cursor()
+
+    target_cursor.execute("""
+        CREATE SCHEMA IF NOT EXISTS ods;
+    """)
+    target_conn.commit()
+
+    source_cursor.execute("""
         SELECT table_name
         FROM information_schema.tables
-        WHERE table_schema = 'source_data'
-        AND table_type = 'BASE TABLE';
-    """
-    records = source_hook.get_records(query)
-    return [record[0] for record in records]
+        WHERE table_schema = 'source_data';
+    """)
 
-
-def create_ods_schema_and_tables():
-    target_hook = PostgresHook(postgres_conn_id='etl_db_4_conn')
-
-    target_hook.run("CREATE SCHEMA IF NOT EXISTS ods;")
-
-    tables = get_tables()
-
+    tables = source_cursor.fetchall()
     for table in tables:
-        target_hook.run(f"DROP TABLE IF EXISTS ods.{table}")
-        create_table_query = f'''
-            CREATE TABLE ods.{table} (
-                LIKE source_data.{table} INCLUDING ALL
-            );
-        '''
-        target_hook.run(create_table_query)
+        table_name = table[0]
+
+        source_cursor.execute(f"""
+            SELECT column_name, data_type
+            FROM information_schema.columns
+            WHERE table_name = '{table_name}';
+        """)
+
+        columns = source_cursor.fetchall()
+        create_table_query = f"CREATE TABLE IF NOT EXISTS ods.{table_name} ("
+        column_definitions = []
+        for col in columns:
+            column_name = col[0]
+            data_type = col[1]
+            column_name = f'"{column_name}"'
+            column_definitions.append(f"{column_name} {data_type}")
+
+        create_table_query += ", ".join(column_definitions)
+        create_table_query += ");"
+
+        target_cursor.execute(create_table_query)
+        target_conn.commit()
+
+    source_cursor.close()
+    target_cursor.close()
+    source_conn.close()
+    target_conn.close()
 
 
-create_ods_schema_and_tables_task = PythonOperator(
-    task_id='create_ods_schema_and_tables',
-    python_callable=create_ods_schema_and_tables,
-    dag=dag,
-)
+with DAG(
+    'ods_init',
+    default_args=default_args,
+    description='makes a copy of a source scheme into ods layer',
+    schedule_interval="@daily",
+    start_date=days_ago(1)
+) as dag:
 
+    copy_schema_task = PythonOperator(
+        task_id='copy_schema',
+        python_callable=copy_schema,
+        op_args=['source_conn', 'etl_db_4_conn'],
+        catchup=False,
+    )
 
+    copy_schema_task
