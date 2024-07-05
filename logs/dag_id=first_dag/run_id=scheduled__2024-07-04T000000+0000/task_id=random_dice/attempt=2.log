@@ -1,0 +1,40 @@
+[2024-07-05T11:26:36.226+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2024-07-05T11:26:36.247+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: first_dag.random_dice scheduled__2024-07-04T00:00:00+00:00 [queued]>
+[2024-07-05T11:26:36.253+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: first_dag.random_dice scheduled__2024-07-04T00:00:00+00:00 [queued]>
+[2024-07-05T11:26:36.254+0000] {taskinstance.py:2306} INFO - Starting attempt 2 of 3
+[2024-07-05T11:26:36.267+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): random_dice> on 2024-07-04 00:00:00+00:00
+[2024-07-05T11:26:36.272+0000] {warnings.py:112} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:61: DeprecationWarning: This process (pid=749) is multi-threaded, use of fork() may lead to deadlocks in the child.
+  pid = os.fork()
+
+[2024-07-05T11:26:36.274+0000] {standard_task_runner.py:63} INFO - Started process 750 to run task
+[2024-07-05T11:26:36.274+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'first_dag', 'random_dice', 'scheduled__2024-07-04T00:00:00+00:00', '--job-id', '339', '--raw', '--subdir', 'DAGS_FOLDER/first_dag.py', '--cfg-path', '/tmp/tmp_md0h7l6']
+[2024-07-05T11:26:36.275+0000] {standard_task_runner.py:91} INFO - Job 339: Subtask random_dice
+[2024-07-05T11:26:36.325+0000] {task_command.py:426} INFO - Running <TaskInstance: first_dag.random_dice scheduled__2024-07-04T00:00:00+00:00 [running]> on host 07d7d8ee1848
+[2024-07-05T11:26:36.406+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='first_dag' AIRFLOW_CTX_TASK_ID='random_dice' AIRFLOW_CTX_EXECUTION_DATE='2024-07-04T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-07-04T00:00:00+00:00'
+[2024-07-05T11:26:36.407+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2024-07-05T11:26:36.419+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2024-07-05T11:26:36.419+0000] {taskinstance.py:2905} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 465, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 432, in _execute_callable
+    return execute_callable(context=context, **execute_callable_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/baseoperator.py", line 401, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/operators/python.py", line 235, in execute
+    return_value = self.execute_callable()
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/operators/python.py", line 252, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/airflow/dags/first_dag.py", line 18, in random_dice
+    raise ValueError(f'Odd {val}')
+ValueError: Odd 1
+[2024-07-05T11:26:36.431+0000] {taskinstance.py:1206} INFO - Marking task as UP_FOR_RETRY. dag_id=first_dag, task_id=random_dice, run_id=scheduled__2024-07-04T00:00:00+00:00, execution_date=20240704T000000, start_date=20240705T112636, end_date=20240705T112636
+[2024-07-05T11:26:36.444+0000] {standard_task_runner.py:110} ERROR - Failed to execute job 339 for task random_dice (Odd 1; 750)
+[2024-07-05T11:26:36.488+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 1
+[2024-07-05T11:26:36.502+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2024-07-05T11:26:36.504+0000] {local_task_job_runner.py:222} INFO - ::endgroup::
