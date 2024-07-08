@@ -27,12 +27,13 @@ dag = DAG(
 def get_data():
     source_hook = PostgresHook(postgres_conn_id='source_conn')
     query = """
-        SELECT *
-        FROM source.source_data.резюмедар
-        LIMIT 1;
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'source_data'
+        AND table_type = 'BASE TABLE';
     """
     records = source_hook.get_records(query)
-    print(records)
+    print([record[0] for record in records])
 
 
 load_data_to_ods_task = PythonOperator(

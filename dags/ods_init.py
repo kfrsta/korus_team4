@@ -69,14 +69,13 @@ with DAG(
     default_args=default_args,
     description='makes a copy of a source scheme into ods layer',
     schedule_interval="@daily",
-    start_date=days_ago(1)
+    start_date=days_ago(1),
+    catchup=False
 ) as dag:
-
     copy_schema_task = PythonOperator(
         task_id='copy_schema',
         python_callable=copy_schema,
-        op_args=['source_conn', 'etl_db_4_conn'],
-        catchup=False,
+        op_args=['source_conn', 'etl_db_4_conn']
     )
 
     copy_schema_task

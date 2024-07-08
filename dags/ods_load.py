@@ -14,15 +14,6 @@ default_args = {
     'retries': 0
 }
 
-dag = DAG(
-    'ods_load',
-    default_args=default_args,
-    description='Load data to ODS schema',
-    schedule_interval="@daily",
-    start_date=days_ago(1),
-    catchup=False,
-)
-
 
 def get_tables():
     source_hook = PostgresHook(postgres_conn_id='source_conn')
@@ -48,8 +39,15 @@ def load_data_to_ods():
         target_hook.insert_rows(f'etl_db_4.ods.{table}', rows=records)
 
 
-load_data_to_ods_task = PythonOperator(
-    task_id='load_data_to_ods',
-    python_callable=load_data_to_ods,
-    dag=dag,
-)
+with DAG(
+    'ods_load',
+    default_args=default_args,
+    description='Load data to ODS schema',
+    schedule_interval="@daily",
+    start_date=days_ago(1),
+    catchup=False
+) as dag:
+    load_data_ods_task = PythonOperator(
+        task_id='load_data_to_ods',
+        python_callable=load_data_to_ods
+    )
