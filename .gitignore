@@ -1,4 +1,5 @@
 venv/
+logs/
 .pylintrc
 __pycache__/
 
