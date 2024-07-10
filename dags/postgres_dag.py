@@ -14,7 +14,7 @@ with DAG(dag_id='postgres_dag',  # уникальный id
          default_args=default_args) as dag:
     test_sql = PostgresOperator(
         task_id='select_limit_1',
-        postgres_conn_id='postgres_default',
+        postgres_conn_id='source_db',
         sql="SELECT * FROM source.source_data.базы_данных LIMIT 1",
         dag=dag,
     )
