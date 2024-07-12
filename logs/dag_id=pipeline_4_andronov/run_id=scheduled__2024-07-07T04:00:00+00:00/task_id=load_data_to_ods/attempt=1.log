@@ -1,0 +1,261 @@
+[2024-07-08T13:43:34.871+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2024-07-08T13:43:34.907+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: pipeline_4_andronov.load_data_to_ods scheduled__2024-07-07T04:00:00+00:00 [queued]>
+[2024-07-08T13:43:34.918+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: pipeline_4_andronov.load_data_to_ods scheduled__2024-07-07T04:00:00+00:00 [queued]>
+[2024-07-08T13:43:34.918+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2024-07-08T13:43:34.932+0000] {taskinstance.py:2330} INFO - Executing <Task(_PythonDecoratedOperator): load_data_to_ods> on 2024-07-07 04:00:00+00:00
+[2024-07-08T13:43:34.942+0000] {warnings.py:112} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:61: DeprecationWarning: This process (pid=150) is multi-threaded, use of fork() may lead to deadlocks in the child.
+  pid = os.fork()
+
+[2024-07-08T13:43:34.946+0000] {standard_task_runner.py:63} INFO - Started process 152 to run task
+[2024-07-08T13:43:34.945+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'pipeline_4_andronov', 'load_data_to_ods', 'scheduled__2024-07-07T04:00:00+00:00', '--job-id', '4', '--raw', '--subdir', 'DAGS_FOLDER/ods_load.py', '--cfg-path', '/tmp/tmp1qlv6a9w']
+[2024-07-08T13:43:34.947+0000] {standard_task_runner.py:91} INFO - Job 4: Subtask load_data_to_ods
+[2024-07-08T13:43:35.091+0000] {task_command.py:426} INFO - Running <TaskInstance: pipeline_4_andronov.load_data_to_ods scheduled__2024-07-07T04:00:00+00:00 [running]> on host abab0bea2faf
+[2024-07-08T13:43:35.218+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='pipeline_4_andronov' AIRFLOW_CTX_TASK_ID='load_data_to_ods' AIRFLOW_CTX_EXECUTION_DATE='2024-07-07T04:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2024-07-07T04:00:00+00:00'
+[2024-07-08T13:43:35.219+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2024-07-08T13:43:35.236+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:43:35.394+0000] {sql.py:487} INFO - Running statement: 
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'source_data'
+            AND table_type = 'BASE TABLE';
+        , parameters: None
+[2024-07-08T13:43:35.480+0000] {sql.py:496} INFO - Rows affected: 31
+[2024-07-08T13:43:35.530+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:43:35.712+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.уровни_знаний, parameters: None
+[2024-07-08T13:43:35.801+0000] {sql.py:496} INFO - Rows affected: 6
+[2024-07-08T13:43:35.845+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:43:36.013+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:43:36.329+0000] {sql.py:598} INFO - Loaded 6 rows into andronov_ods.уровни_знаний so far
+[2024-07-08T13:43:36.330+0000] {sql.py:611} INFO - Done loading. Loaded a total of 6 rows into andronov_ods.уровни_знаний
+[2024-07-08T13:43:36.336+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:43:36.526+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.языки_пользователей, parameters: None
+[2024-07-08T13:43:36.706+0000] {sql.py:496} INFO - Rows affected: 451
+[2024-07-08T13:43:36.771+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:43:36.952+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:43:55.071+0000] {sql.py:598} INFO - Loaded 451 rows into andronov_ods.языки_пользователей so far
+[2024-07-08T13:43:55.072+0000] {sql.py:611} INFO - Done loading. Loaded a total of 451 rows into andronov_ods.языки_пользователей
+[2024-07-08T13:43:55.079+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:43:55.233+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.типы_систем, parameters: None
+[2024-07-08T13:43:55.310+0000] {sql.py:496} INFO - Rows affected: 8
+[2024-07-08T13:43:55.355+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:43:55.513+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:43:55.888+0000] {sql.py:598} INFO - Loaded 8 rows into andronov_ods.типы_систем so far
+[2024-07-08T13:43:55.889+0000] {sql.py:611} INFO - Done loading. Loaded a total of 8 rows into andronov_ods.типы_систем
+[2024-07-08T13:43:55.896+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:43:56.069+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.уровень_образования, parameters: None
+[2024-07-08T13:43:56.155+0000] {sql.py:496} INFO - Rows affected: 31
+[2024-07-08T13:43:56.202+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:43:56.368+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:43:57.677+0000] {sql.py:598} INFO - Loaded 31 rows into andronov_ods.уровень_образования so far
+[2024-07-08T13:43:57.678+0000] {sql.py:611} INFO - Done loading. Loaded a total of 31 rows into andronov_ods.уровень_образования
+[2024-07-08T13:43:57.685+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:43:57.870+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.среды_разработки, parameters: None
+[2024-07-08T13:43:57.978+0000] {sql.py:496} INFO - Rows affected: 6
+[2024-07-08T13:43:58.025+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:43:58.191+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:43:58.499+0000] {sql.py:598} INFO - Loaded 6 rows into andronov_ods.среды_разработки so far
+[2024-07-08T13:43:58.499+0000] {sql.py:611} INFO - Done loading. Loaded a total of 6 rows into andronov_ods.среды_разработки
+[2024-07-08T13:43:58.506+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:43:58.659+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.технологии_и_уровень_знаний_сотру, parameters: None
+[2024-07-08T13:43:58.979+0000] {sql.py:496} INFO - Rows affected: 2520
+[2024-07-08T13:43:59.036+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:43:59.217+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:44:39.786+0000] {sql.py:598} INFO - Loaded 1000 rows into andronov_ods.технологии_и_уровень_знаний_сотру so far
+[2024-07-08T13:44:39.797+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:45:19.434+0000] {sql.py:598} INFO - Loaded 1000 rows into andronov_ods.технологии_и_уровень_знаний_сотру so far
+[2024-07-08T13:45:19.442+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:45:40.633+0000] {sql.py:598} INFO - Loaded 520 rows into andronov_ods.технологии_и_уровень_знаний_сотру so far
+[2024-07-08T13:45:40.634+0000] {sql.py:611} INFO - Done loading. Loaded a total of 2520 rows into andronov_ods.технологии_и_уровень_знаний_сотру
+[2024-07-08T13:45:40.641+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:45:40.794+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.уровни_владения_ин, parameters: None
+[2024-07-08T13:45:40.870+0000] {sql.py:496} INFO - Rows affected: 6
+[2024-07-08T13:45:40.915+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:45:41.102+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:45:41.441+0000] {sql.py:598} INFO - Loaded 6 rows into andronov_ods.уровни_владения_ин so far
+[2024-07-08T13:45:41.441+0000] {sql.py:611} INFO - Done loading. Loaded a total of 6 rows into andronov_ods.уровни_владения_ин
+[2024-07-08T13:45:41.448+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:45:41.621+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.языки_программирования, parameters: None
+[2024-07-08T13:45:41.707+0000] {sql.py:496} INFO - Rows affected: 32
+[2024-07-08T13:45:41.760+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:45:41.930+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:45:43.265+0000] {sql.py:598} INFO - Loaded 32 rows into andronov_ods.языки_программирования so far
+[2024-07-08T13:45:43.266+0000] {sql.py:611} INFO - Done loading. Loaded a total of 32 rows into andronov_ods.языки_программирования
+[2024-07-08T13:45:43.273+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:45:43.460+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.фреймворки, parameters: None
+[2024-07-08T13:45:43.537+0000] {sql.py:496} INFO - Rows affected: 17
+[2024-07-08T13:45:43.580+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:45:43.747+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:45:44.492+0000] {sql.py:598} INFO - Loaded 17 rows into andronov_ods.фреймворки so far
+[2024-07-08T13:45:44.492+0000] {sql.py:611} INFO - Done loading. Loaded a total of 17 rows into andronov_ods.фреймворки
+[2024-07-08T13:45:44.499+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:45:44.662+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.платформы_и_уровень_знаний_сотруд, parameters: None
+[2024-07-08T13:45:44.936+0000] {sql.py:496} INFO - Rows affected: 1489
+[2024-07-08T13:45:44.983+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:45:45.147+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:46:25.475+0000] {sql.py:598} INFO - Loaded 1000 rows into andronov_ods.платформы_и_уровень_знаний_сотруд so far
+[2024-07-08T13:46:25.483+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:46:45.442+0000] {sql.py:598} INFO - Loaded 489 rows into andronov_ods.платформы_и_уровень_знаний_сотруд so far
+[2024-07-08T13:46:45.443+0000] {sql.py:611} INFO - Done loading. Loaded a total of 1489 rows into andronov_ods.платформы_и_уровень_знаний_сотруд
+[2024-07-08T13:46:45.449+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:46:45.619+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.платформы, parameters: None
+[2024-07-08T13:46:45.717+0000] {sql.py:496} INFO - Rows affected: 40
+[2024-07-08T13:46:45.787+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:46:45.953+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:46:47.608+0000] {sql.py:598} INFO - Loaded 40 rows into andronov_ods.платформы so far
+[2024-07-08T13:46:47.608+0000] {sql.py:611} INFO - Done loading. Loaded a total of 40 rows into andronov_ods.платформы
+[2024-07-08T13:46:47.614+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:46:47.770+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.предметная_область, parameters: None
+[2024-07-08T13:46:47.858+0000] {sql.py:496} INFO - Rows affected: 13
+[2024-07-08T13:46:47.903+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:46:48.067+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:46:48.704+0000] {sql.py:598} INFO - Loaded 13 rows into andronov_ods.предметная_область so far
+[2024-07-08T13:46:48.705+0000] {sql.py:611} INFO - Done loading. Loaded a total of 13 rows into andronov_ods.предметная_область
+[2024-07-08T13:46:48.712+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:46:48.878+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.языки, parameters: None
+[2024-07-08T13:46:48.965+0000] {sql.py:496} INFO - Rows affected: 6
+[2024-07-08T13:46:49.013+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:46:49.176+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:46:49.551+0000] {sql.py:598} INFO - Loaded 6 rows into andronov_ods.языки so far
+[2024-07-08T13:46:49.552+0000] {sql.py:611} INFO - Done loading. Loaded a total of 6 rows into andronov_ods.языки
+[2024-07-08T13:46:49.559+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:46:49.715+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.инструменты_и_уровень_знаний_сотр, parameters: None
+[2024-07-08T13:46:50.042+0000] {sql.py:496} INFO - Rows affected: 1993
+[2024-07-08T13:46:50.088+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:46:50.293+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:47:30.574+0000] {sql.py:598} INFO - Loaded 1000 rows into andronov_ods.инструменты_и_уровень_знаний_сотр so far
+[2024-07-08T13:47:30.585+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:48:11.494+0000] {sql.py:598} INFO - Loaded 993 rows into andronov_ods.инструменты_и_уровень_знаний_сотр so far
+[2024-07-08T13:48:11.495+0000] {sql.py:611} INFO - Done loading. Loaded a total of 1993 rows into andronov_ods.инструменты_и_уровень_знаний_сотр
+[2024-07-08T13:48:11.502+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:48:11.658+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.базы_данных_и_уровень_знаний_сотру, parameters: None
+[2024-07-08T13:48:11.826+0000] {sql.py:496} INFO - Rows affected: 495
+[2024-07-08T13:48:11.876+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:48:12.038+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:48:31.726+0000] {sql.py:598} INFO - Loaded 495 rows into andronov_ods.базы_данных_и_уровень_знаний_сотру so far
+[2024-07-08T13:48:31.727+0000] {sql.py:611} INFO - Done loading. Loaded a total of 495 rows into andronov_ods.базы_данных_и_уровень_знаний_сотру
+[2024-07-08T13:48:31.736+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:48:31.900+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.базы_данных, parameters: None
+[2024-07-08T13:48:31.985+0000] {sql.py:496} INFO - Rows affected: 17
+[2024-07-08T13:48:32.028+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:48:32.211+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:48:33.026+0000] {sql.py:598} INFO - Loaded 17 rows into andronov_ods.базы_данных so far
+[2024-07-08T13:48:33.026+0000] {sql.py:611} INFO - Done loading. Loaded a total of 17 rows into andronov_ods.базы_данных
+[2024-07-08T13:48:33.033+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:48:33.188+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.отрасли, parameters: None
+[2024-07-08T13:48:33.268+0000] {sql.py:496} INFO - Rows affected: 8
+[2024-07-08T13:48:33.316+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:48:33.516+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:48:33.958+0000] {sql.py:598} INFO - Loaded 8 rows into andronov_ods.отрасли so far
+[2024-07-08T13:48:33.958+0000] {sql.py:611} INFO - Done loading. Loaded a total of 8 rows into andronov_ods.отрасли
+[2024-07-08T13:48:33.965+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:48:34.128+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.сотрудники_дар, parameters: None
+[2024-07-08T13:48:34.376+0000] {sql.py:496} INFO - Rows affected: 483
+[2024-07-08T13:48:34.428+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:48:34.616+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:48:53.516+0000] {sql.py:598} INFO - Loaded 483 rows into andronov_ods.сотрудники_дар so far
+[2024-07-08T13:48:53.517+0000] {sql.py:611} INFO - Done loading. Loaded a total of 483 rows into andronov_ods.сотрудники_дар
+[2024-07-08T13:48:53.524+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:48:53.690+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.среды_разработки_и_уровень_знаний_, parameters: None
+[2024-07-08T13:48:53.809+0000] {sql.py:496} INFO - Rows affected: 188
+[2024-07-08T13:48:53.856+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:48:54.010+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:49:01.566+0000] {sql.py:598} INFO - Loaded 188 rows into andronov_ods.среды_разработки_и_уровень_знаний_ so far
+[2024-07-08T13:49:01.566+0000] {sql.py:611} INFO - Done loading. Loaded a total of 188 rows into andronov_ods.среды_разработки_и_уровень_знаний_
+[2024-07-08T13:49:01.575+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:49:01.772+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.сертификаты_пользователей, parameters: None
+[2024-07-08T13:49:02.069+0000] {sql.py:496} INFO - Rows affected: 1235
+[2024-07-08T13:49:02.113+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:49:02.274+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:49:43.552+0000] {sql.py:598} INFO - Loaded 1000 rows into andronov_ods.сертификаты_пользователей so far
+[2024-07-08T13:49:43.559+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:49:53.019+0000] {sql.py:598} INFO - Loaded 235 rows into andronov_ods.сертификаты_пользователей so far
+[2024-07-08T13:49:53.019+0000] {sql.py:611} INFO - Done loading. Loaded a total of 1235 rows into andronov_ods.сертификаты_пользователей
+[2024-07-08T13:49:53.025+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:49:53.199+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.фреймворки_и_уровень_знаний_сотру, parameters: None
+[2024-07-08T13:49:53.358+0000] {sql.py:496} INFO - Rows affected: 174
+[2024-07-08T13:49:53.403+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:49:53.568+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:50:00.985+0000] {sql.py:598} INFO - Loaded 174 rows into andronov_ods.фреймворки_и_уровень_знаний_сотру so far
+[2024-07-08T13:50:00.986+0000] {sql.py:611} INFO - Done loading. Loaded a total of 174 rows into andronov_ods.фреймворки_и_уровень_знаний_сотру
+[2024-07-08T13:50:00.993+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:50:01.152+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.языки_программирования_и_уровень, parameters: None
+[2024-07-08T13:50:01.391+0000] {sql.py:496} INFO - Rows affected: 1227
+[2024-07-08T13:50:01.434+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:50:01.617+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:50:43.240+0000] {sql.py:598} INFO - Loaded 1000 rows into andronov_ods.языки_программирования_и_уровень so far
+[2024-07-08T13:50:43.249+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:50:52.416+0000] {sql.py:598} INFO - Loaded 227 rows into andronov_ods.языки_программирования_и_уровень so far
+[2024-07-08T13:50:52.417+0000] {sql.py:611} INFO - Done loading. Loaded a total of 1227 rows into andronov_ods.языки_программирования_и_уровень
+[2024-07-08T13:50:52.423+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:50:52.577+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.образование_пользователей, parameters: None
+[2024-07-08T13:50:53.369+0000] {sql.py:496} INFO - Rows affected: 2971
+[2024-07-08T13:50:53.423+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:50:53.637+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:51:34.306+0000] {sql.py:598} INFO - Loaded 1000 rows into andronov_ods.образование_пользователей so far
+[2024-07-08T13:51:34.317+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:52:15.377+0000] {sql.py:598} INFO - Loaded 1000 rows into andronov_ods.образование_пользователей so far
+[2024-07-08T13:52:15.389+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:52:55.338+0000] {sql.py:598} INFO - Loaded 971 rows into andronov_ods.образование_пользователей so far
+[2024-07-08T13:52:55.338+0000] {sql.py:611} INFO - Done loading. Loaded a total of 2971 rows into andronov_ods.образование_пользователей
+[2024-07-08T13:52:55.344+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:52:55.520+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.уровни_знаний_в_отрасли, parameters: None
+[2024-07-08T13:52:55.601+0000] {sql.py:496} INFO - Rows affected: 3
+[2024-07-08T13:52:55.651+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:52:55.814+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:52:56.016+0000] {sql.py:598} INFO - Loaded 3 rows into andronov_ods.уровни_знаний_в_отрасли so far
+[2024-07-08T13:52:56.016+0000] {sql.py:611} INFO - Done loading. Loaded a total of 3 rows into andronov_ods.уровни_знаний_в_отрасли
+[2024-07-08T13:52:56.022+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:52:56.179+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.опыт_сотрудника_в_предметных_обла, parameters: None
+[2024-07-08T13:52:56.352+0000] {sql.py:496} INFO - Rows affected: 318
+[2024-07-08T13:52:56.397+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:52:56.560+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:09.523+0000] {sql.py:598} INFO - Loaded 318 rows into andronov_ods.опыт_сотрудника_в_предметных_обла so far
+[2024-07-08T13:53:09.523+0000] {sql.py:611} INFO - Done loading. Loaded a total of 318 rows into andronov_ods.опыт_сотрудника_в_предметных_обла
+[2024-07-08T13:53:09.530+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:53:09.692+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.типы_систем_и_уровень_знаний_сотру, parameters: None
+[2024-07-08T13:53:09.856+0000] {sql.py:496} INFO - Rows affected: 278
+[2024-07-08T13:53:09.901+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:10.070+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:21.459+0000] {sql.py:598} INFO - Loaded 278 rows into andronov_ods.типы_систем_и_уровень_знаний_сотру so far
+[2024-07-08T13:53:21.459+0000] {sql.py:611} INFO - Done loading. Loaded a total of 278 rows into andronov_ods.типы_систем_и_уровень_знаний_сотру
+[2024-07-08T13:53:21.466+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:53:21.631+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.уровни_знаний_в_предметной_област, parameters: None
+[2024-07-08T13:53:21.710+0000] {sql.py:496} INFO - Rows affected: 3
+[2024-07-08T13:53:21.755+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:21.922+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:22.119+0000] {sql.py:598} INFO - Loaded 3 rows into andronov_ods.уровни_знаний_в_предметной_област so far
+[2024-07-08T13:53:22.120+0000] {sql.py:611} INFO - Done loading. Loaded a total of 3 rows into andronov_ods.уровни_знаний_в_предметной_област
+[2024-07-08T13:53:22.126+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:53:22.302+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.инструменты, parameters: None
+[2024-07-08T13:53:22.382+0000] {sql.py:496} INFO - Rows affected: 25
+[2024-07-08T13:53:22.425+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:22.585+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:23.632+0000] {sql.py:598} INFO - Loaded 25 rows into andronov_ods.инструменты so far
+[2024-07-08T13:53:23.632+0000] {sql.py:611} INFO - Done loading. Loaded a total of 25 rows into andronov_ods.инструменты
+[2024-07-08T13:53:23.638+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:53:23.798+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.опыт_сотрудника_в_отраслях, parameters: None
+[2024-07-08T13:53:23.968+0000] {sql.py:496} INFO - Rows affected: 306
+[2024-07-08T13:53:24.013+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:24.185+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:36.529+0000] {sql.py:598} INFO - Loaded 306 rows into andronov_ods.опыт_сотрудника_в_отраслях so far
+[2024-07-08T13:53:36.530+0000] {sql.py:611} INFO - Done loading. Loaded a total of 306 rows into andronov_ods.опыт_сотрудника_в_отраслях
+[2024-07-08T13:53:36.537+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:53:36.731+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.резюмедар, parameters: None
+[2024-07-08T13:53:37.024+0000] {sql.py:496} INFO - Rows affected: 493
+[2024-07-08T13:53:37.070+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:37.255+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:57.132+0000] {sql.py:598} INFO - Loaded 493 rows into andronov_ods.резюмедар so far
+[2024-07-08T13:53:57.133+0000] {sql.py:611} INFO - Done loading. Loaded a total of 493 rows into andronov_ods.резюмедар
+[2024-07-08T13:53:57.141+0000] {base.py:84} INFO - Using connection ID 'source_conn' for task execution.
+[2024-07-08T13:53:57.313+0000] {sql.py:487} INFO - Running statement: SELECT * FROM source_data.технологии, parameters: None
+[2024-07-08T13:53:57.395+0000] {sql.py:496} INFO - Rows affected: 55
+[2024-07-08T13:53:57.445+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:57.614+0000] {base.py:84} INFO - Using connection ID 'etl_db_4_conn' for task execution.
+[2024-07-08T13:53:59.972+0000] {sql.py:598} INFO - Loaded 55 rows into andronov_ods.технологии so far
+[2024-07-08T13:53:59.973+0000] {sql.py:611} INFO - Done loading. Loaded a total of 55 rows into andronov_ods.технологии
+[2024-07-08T13:53:59.973+0000] {python.py:237} INFO - Done. Returned value was: None
+[2024-07-08T13:53:59.975+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2024-07-08T13:53:59.986+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=pipeline_4_andronov, task_id=load_data_to_ods, run_id=scheduled__2024-07-07T04:00:00+00:00, execution_date=20240707T040000, start_date=20240708T134334, end_date=20240708T135359
+[2024-07-08T13:54:00.047+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 0
+[2024-07-08T13:54:00.065+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2024-07-08T13:54:00.067+0000] {local_task_job_runner.py:222} INFO - ::endgroup::
