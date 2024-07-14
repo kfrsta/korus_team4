@@ -3,9 +3,7 @@ import datetime as dt
 from airflow import DAG
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.operators.python import PythonOperator
-from airflow.operators.generic_transfer import GenericTransfer
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-from airflow.utils.task_group import TaskGroup
 
 source_conn_id = 'source_db'
 target_conn_id = 'etl_db_4'
@@ -30,23 +28,21 @@ def migrate_tables_11():
     with target_hook.get_conn() as conn:
         with conn.cursor() as target_cur:
             for table in table_names:
-                query = f"""SELECT column_name, data_type
-                FROM information_schema.columns
-                WHERE table_name = '{table}' AND table_schema = '{source_schema_name}';"""
+                for schema in ['dvyacheslav_intermediate', 'dvyacheslav_broken_data']:
+                    query = f"""SELECT column_name, data_type
+                    FROM information_schema.columns
+                    WHERE table_name = '{table}' AND table_schema = '{source_schema_name}';"""
 
-                target_cur.execute(query)
-                data = target_cur.fetchall()
+                    target_cur.execute(query)
+                    data = target_cur.fetchall()
 
-                s = f"CREATE TABLE IF NOT EXISTS {target_schema_name}.{table} ("
-                for column_name, data_type in data:
-                    if column_name == 'User ID' or column_name == 'название':
-                        s += '"user_id" integer, '
-                    elif column_name not in ['активность', 'Сорт.', 'Дата изм.']:
-                        column_name = column_name.lower().replace(' ', '_')
-                        s += f'"{column_name}" {data_type}, '
-                create_table_query = s.rstrip(', ') + ');'
+                    s = f"CREATE TABLE IF NOT EXISTS {schema}.{table} ("
+                    for column_name, data_type in data:
+                        if column_name not in ['активность', 'сорт.', 'дата_изм.']:
+                            s += f'"{column_name}" {data_type}, '
+                    create_table_query = s.rstrip(', ') + ');'
 
-                target_cur.execute(create_table_query)
+                    target_cur.execute(create_table_query)
 
 
 with DAG(
@@ -54,8 +50,16 @@ with DAG(
         schedule_interval=None,
         default_args=default_args,
 ) as dag:
+    create_schema = PostgresOperator(
+        task_id='create_intermediate_and_broken_data_schema',
+        sql='sql/create_intermediate_schema.sql',
+        postgres_conn_id=target_conn_id,
+    )
+
     extract_and_insert_tables = PythonOperator(
         task_id='migrate_tables_11',
         python_callable=migrate_tables_11,
         dag=dag
     )
+
+    create_schema >> extract_and_insert_tables

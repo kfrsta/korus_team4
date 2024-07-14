@@ -45,8 +45,9 @@ def get_data_from_source_data():
                 source_cur.execute(query)
                 data = source_cur.fetchall()
 
-                s = f"CREATE TABLE IF NOT EXISTS dvyacheslav_ods.{table} ("
+                s = f"CREATE TABLE IF NOT EXISTS {target_schema_name}.{table} ("
                 for column_name, data_type in data:
+                    column_name = column_name.lower().replace(' ', '_')
                     s += f'"{column_name}" {data_type}, '
                 create_table_query = s.rstrip(', ') + ');'
 
