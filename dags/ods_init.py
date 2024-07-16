@@ -10,6 +10,7 @@ default_args = {
     'retries': 0,
 }
 
+
 @dag(
     dag_id='ods_init',
     default_args=default_args,
@@ -21,9 +22,9 @@ default_args = {
 def copy_schema_dag():
 
     @task
-    def copy_schema(source_conn_id, target_conn_id):
-        source_hook = PostgresHook(postgres_conn_id=source_conn_id)
-        target_hook = PostgresHook(postgres_conn_id=target_conn_id)
+    def copy_schema():
+        source_hook = PostgresHook('source_conn')
+        target_hook = PostgresHook('etl_db_4_conn')
 
         source_conn = source_hook.get_conn()
         target_conn = target_hook.get_conn()
@@ -36,33 +37,25 @@ def copy_schema_dag():
         """)
         target_conn.commit()
 
-        source_cursor.execute("""
-            SELECT table_name
-            FROM information_schema.tables
-            WHERE table_schema = 'source_data';
-        """)
+        tables = ['базы_данных', 'базы_данных_и_уровень_знаний_сотру', 'инструменты', 'инструменты_и_уровень_знаний_сотр', 'образование_пользователей', 'опыт_сотрудника_в_отраслях', 'опыт_сотрудника_в_предметных_обла', 'отрасли', 'платформы', 'платформы_и_уровень_знаний_сотруд', 'предметная_область', 'резюмедар', 'сертификаты_пользователей', 'сотрудники_дар', 'среды_разработки',
+                  'среды_разработки_и_уровень_знаний_', 'технологии', 'технологии_и_уровень_знаний_сотру', 'типы_систем', 'типы_систем_и_уровень_знаний_сотру', 'уровень_образования', 'уровни_владения_ин', 'уровни_знаний', 'уровни_знаний_в_отрасли', 'уровни_знаний_в_предметной_област', 'фреймворки', 'фреймворки_и_уровень_знаний_сотру', 'языки', 'языки_пользователей', 'языки_программирования', 'языки_программирования_и_уровень']
 
-        tables = source_cursor.fetchall()
-        for table in tables:
-            table_name = table[0]
-
-            source_cursor.execute(f"""
+        for table_name in tables:
+            source_cursor.execute("""
                 SELECT column_name, data_type
                 FROM information_schema.columns
-                WHERE table_name = '{table_name}';
-            """)
+                WHERE table_name = %s;
+            """, (table_name,))
 
             columns = source_cursor.fetchall()
-            create_table_query = f"CREATE TABLE IF NOT EXISTS andronov_ods.{table_name} ("
-            column_definitions = []
-            for col in columns:
-                column_name = col[0]
-                data_type = col[1]
-                column_name = f'"{column_name}"'
-                column_definitions.append(f"{column_name} {data_type}")
+            column_definitions = [
+                f'"{column_name}" {data_type}' for column_name, data_type in columns]
 
-            create_table_query += ", ".join(column_definitions)
-            create_table_query += ");"
+            create_table_query = f"""
+                CREATE TABLE IF NOT EXISTS andronov_ods.{table_name} (
+                    {", ".join(column_definitions)}
+                );
+            """
 
             target_cursor.execute(create_table_query)
             target_conn.commit()
@@ -72,6 +65,7 @@ def copy_schema_dag():
         source_conn.close()
         target_conn.close()
 
-    copy_schema_task = copy_schema('source_conn', 'etl_db_4_conn')
+    copy_schema_task = copy_schema()
 
-copy_schema_dag = copy_schema_dag()
+
+init_dag = copy_schema_dag()
