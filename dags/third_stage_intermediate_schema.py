@@ -4,6 +4,7 @@ import pandas as pd
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
+from sqlalchemy import Integer
 
 target_conn_id = 'etl_db_4'
 source_schema_name = 'dvyacheslav_ods'
@@ -21,7 +22,7 @@ table_names = [
     'инструменты_и_уровень_знаний_сотр', 'базы_данных_и_уровень_знаний_сотру',
     'среды_разработки_и_уровень_знаний_', 'фреймворки_и_уровень_знаний_сотру',
     'языки_программирования_и_уровень', 'типы_систем_и_уровень_знаний_сотру',
-    'сертификаты_пользователей', 'образование_пользователей'
+    'сертификаты_пользователей'
 ]
 
 table_attributes = {
@@ -35,20 +36,17 @@ table_attributes = {
     'среды_разработки_и_уровень_знаний_': ['среды_разработки', 'уровень_знаний'],
     'фреймворки_и_уровень_знаний_сотру': ['фреймворки', 'уровень_знаний'],
     'языки_программирования_и_уровень': ['языки_программирования', 'уровень_знаний'],
-    'типы_систем_и_уровень_знаний_сотру': ['типы_систем', 'уровень_знаний'],
-    'образование_пользователей': ['уровень_образование']
+    'типы_систем_и_уровень_знаний_сотру': ['типы_систем', 'уровень_знаний']
 }
 
 
 def load_and_process_data():
     hook = PostgresHook(postgres_conn_id=target_conn_id)
     engine = hook.get_sqlalchemy_engine()
-
     with engine.connect() as connection:
         for table in table_names:
             df = pd.read_sql_table(table_name=table, con=connection, schema=source_schema_name)
-
-            df = df.drop(columns=['активность', 'сорт.', 'дата_изм.'])  # так лучше не делать, но пока так
+            df = df.drop(columns=['активность', 'сорт.', 'дата_изм.'])
 
             # поиск строк с пропусками по любому столбцу
             df_with_missing = df[df.apply(lambda x: any(x == ""), axis=1)]
@@ -67,14 +65,15 @@ def load_and_process_data():
                 for column in table_attributes[table]:
                     df_without_missing[column] = df_without_missing[column].str.extract(r'\[(\d+)\]').astype(int)
             df_without_missing.to_sql(name=table, con=connection,
-                                      schema=target_schema_name, if_exists='replace',
+                                      schema=target_schema_name, dtype={'user_id': Integer},
+                                      if_exists='replace',
                                       index=False)
 
 
 with DAG(
         dag_id='pandas_processing_dag',
         default_args=default_args,
-        description='DAG для обработки данных с помощью pandas',
+        description='Обработка и перенос данных из промежуточных таблиц',
         schedule_interval=None,
 ) as dag:
     process_data_task = PythonOperator(

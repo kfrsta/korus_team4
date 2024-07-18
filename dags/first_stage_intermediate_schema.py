@@ -1,5 +1,9 @@
 import datetime as dt
+import sys
 
+sys.path.append("/opt/airflow/utils")
+
+from tables import end_tables
 from airflow import DAG
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.operators.python import PythonOperator
@@ -17,10 +21,7 @@ default_args = {
     'start_date': dt.datetime(2024, 7, 1),
 }
 
-table_names = ['уровни_знаний', 'уровень_образования', 'языки', 'языки_программирования',
-               'типы_систем', 'среды_разработки', 'уровни_владения_ин', 'фреймворки', 'платформы',
-               'предметная_область', 'базы_данных', 'отрасли', 'уровни_знаний_в_отрасли',
-               'уровни_знаний_в_предметной_област', 'инструменты', 'технологии']
+table_names = end_tables
 
 
 def migrate_tables_16():
@@ -30,7 +31,7 @@ def migrate_tables_16():
         with conn.cursor() as target_cur:
             for table in table_names:
                 s = f"""CREATE TABLE IF NOT EXISTS {target_schema_name}.{table} (
-                "id" integer, 
+                "id" int8, 
                 "название" character varying
                 );"""  # возможно, здесь не стоит указывать PRIMARY KEY
 
@@ -38,7 +39,7 @@ def migrate_tables_16():
 
 
 def migrate_information():  # возможно, здесь не стоит использовать GenericTransfer
-    with TaskGroup(group_id="migrate_information_16") as transfer_tasks_group:
+    with TaskGroup(group_id="migrate_information_from_end_tables") as transfer_tasks_group:
         for table in table_names:
             query = f"""SELECT "id", "название" FROM {source_schema_name}.{table};"""
 
@@ -55,7 +56,8 @@ def migrate_information():  # возможно, здесь не стоит ис�
 
 
 with DAG(
-        dag_id='migrate_16',
+        dag_id='migrate_end_tables',
+        description='Перенос конечных таблиц с их содержимым',
         schedule_interval=None,
         default_args=default_args,
 ) as dag:

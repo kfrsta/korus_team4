@@ -48,6 +48,7 @@ def migrate_tables_11():
 with DAG(
         dag_id='migrate_11',
         schedule_interval=None,
+        description='Перенос промежуточных таблиц, без их содержимого (скорее всего этот даг будет удален)',
         default_args=default_args,
 ) as dag:
     create_schema = PostgresOperator(

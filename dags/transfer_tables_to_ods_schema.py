@@ -83,12 +83,13 @@ def create_transfer_tasks():
 
 with DAG(
         dag_id='extract_and_insert',
+        description='Загрузка исходных данных в ods схему',
         schedule_interval=None,
         default_args=default_args,
 ) as dag:
     create_schema = PostgresOperator(
         task_id='create_schema',
-        sql='sql/create_schema.sql',
+        sql='sql/create_ods_schema.sql',
         postgres_conn_id=target_conn_id,
     )
 
