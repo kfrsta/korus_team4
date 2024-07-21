@@ -20,8 +20,6 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/scr:/opt/airflow/scr
-    - ${AIRFLOW_PROJ_DIR:-.}/table_config:/opt/airflow/table_config
-    - ${AIRFLOW_PROJ_DIR:-.}/temp:/opt/airflow/temp
 
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
