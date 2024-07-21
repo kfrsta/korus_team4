@@ -19,7 +19,7 @@ default_args = {
 table = 'сотрудники_дар'
 
 
-def migrate_table_sotrudniki():
+def create_table_sotrudniki():
     target_hook = PostgresHook(postgres_conn_id=target_conn_id)
 
     with target_hook.get_conn() as conn:
@@ -44,7 +44,7 @@ def migrate_table_sotrudniki():
                 target_cur.execute(create_table_query)
 
 
-def migrate_information_sotrudniki():
+def transfer_data():
     hook = PostgresHook(postgres_conn_id=target_conn_id)
     engine =  hook.get_sqlalchemy_engine()
     with engine.connect() as connection:
@@ -69,19 +69,20 @@ def migrate_information_sotrudniki():
 
 with DAG(
         dag_id='migrate_sotrudniki',
+        description='Обработка и перенос основной таблицы сотрудники_дар в intermediate и broken_data схемы',
         schedule_interval=None,
         default_args=default_args,
 ) as dag:
-    extract_and_insert_table = PythonOperator(
-        task_id='migrate_table_sotrudniki',
-        python_callable=migrate_table_sotrudniki,
+    create_table = PythonOperator(
+        task_id='create_table_sotrudniki',
+        python_callable=create_table_sotrudniki,
         dag=dag
     )
 
-    process_data_task = PythonOperator(
-        task_id='migrate_information_sotrudniki',
-        python_callable=migrate_information_sotrudniki,
+    transfer_data_sotrudniki = PythonOperator(
+        task_id='transfer_data_sotrudniki',
+        python_callable=transfer_data,
         dag=dag,
     )
 
-    extract_and_insert_table >> process_data_task
+    create_table >> transfer_data_sotrudniki

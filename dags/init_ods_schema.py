@@ -18,7 +18,7 @@ default_args = {
 }
 
 
-def get_data_from_source_data():
+def create_tables():
     source_hook = PostgresHook(postgres_conn_id=source_conn_id)
     source_cur = source_hook.get_conn().cursor()
 
@@ -54,7 +54,7 @@ def get_data_from_source_data():
                 target_cur.execute(create_table_query)
 
 
-def create_transfer_tasks():
+def transfer_data():
     source_hook = PostgresHook(postgres_conn_id=source_conn_id)
     source_cur = source_hook.get_conn().cursor()
 
@@ -82,7 +82,7 @@ def create_transfer_tasks():
 
 
 with DAG(
-        dag_id='extract_and_insert',
+        dag_id='init_ods_schema',
         description='Загрузка исходных данных в ods схему',
         schedule_interval=None,
         default_args=default_args,
@@ -93,12 +93,10 @@ with DAG(
         postgres_conn_id=target_conn_id,
     )
 
-    extract_and_insert_tables = PythonOperator(
-        task_id='extract_data',
-        python_callable=get_data_from_source_data,
+    create_tables_in_schema = PythonOperator(
+        task_id='create_tables_in_schema',
+        python_callable=create_tables,
         dag=dag
     )
 
-    transfer_tasks_group = create_transfer_tasks()
-
-    create_schema >> extract_and_insert_tables >> transfer_tasks_group
+    create_schema >> create_tables_in_schema >> transfer_data()

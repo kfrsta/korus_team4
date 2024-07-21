@@ -22,7 +22,7 @@ table_names = ['опыт_сотрудника_в_предметных_обла',
                'языки_программирования_и_уровень', 'типы_систем_и_уровень_знаний_сотру']
 
 
-def migrate_tables_11():
+def create_intermediate_tables():
     target_hook = PostgresHook(postgres_conn_id=target_conn_id)
 
     with target_hook.get_conn() as conn:
@@ -46,9 +46,9 @@ def migrate_tables_11():
 
 
 with DAG(
-        dag_id='migrate_11',
-        schedule_interval=None,
+        dag_id='create_intermediate_tables',
         description='Перенос промежуточных таблиц, без их содержимого (скорее всего этот даг будет удален)',
+        schedule_interval=None,
         default_args=default_args,
 ) as dag:
     create_schema = PostgresOperator(
@@ -57,10 +57,10 @@ with DAG(
         postgres_conn_id=target_conn_id,
     )
 
-    extract_and_insert_tables = PythonOperator(
-        task_id='migrate_tables_11',
-        python_callable=migrate_tables_11,
+    create_intermediate_tables_in_schema = PythonOperator(
+        task_id='create_intermediate_tables_in_schema',
+        python_callable=create_intermediate_tables,
         dag=dag
     )
 
-    create_schema >> extract_and_insert_tables
+    create_schema >> create_intermediate_tables_in_schema

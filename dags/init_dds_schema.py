@@ -23,7 +23,7 @@ default_args = {
 }
 
 
-def migrate_tables_16():
+def create_end_tables():
     target_hook = PostgresHook(postgres_conn_id=target_conn_id)
 
     table_names = end_tables
@@ -39,10 +39,10 @@ def migrate_tables_16():
                 target_cur.execute(s)
 
 
-def migrate_other_tables():
+def transfer_data_end_tables():
     table_names = end_tables
 
-    with TaskGroup(group_id="migrate_other_tables") as transfer_tasks_group:
+    with TaskGroup(group_id="transfer_data_end_tables") as transfer_tasks_group:
         for table in table_names:
             query = f"""SELECT * FROM {source_schema_name}.{table};"""
 
@@ -58,14 +58,14 @@ def migrate_other_tables():
         return transfer_tasks_group
 
 
-def migrate():
+def create_intermediate_tables():
     target_hook = PostgresHook(postgres_conn_id=target_conn_id)
 
     table_names = intermediate_tables
 
     with target_hook.get_conn() as conn:
         with conn.cursor() as target_cur:
-            for table in table_names:  # здесь идет обработка таблиц, у которых 3 foreign key атрибута
+            for table in table_names:
                 query = f"""
                 SELECT column_name, data_type
                 FROM information_schema.columns
@@ -93,10 +93,10 @@ def migrate():
                 target_cur.execute(create_table_query)
 
 
-def migrate_information():
+def transfer_data_intermediate_tables():
     table_names = intermediate_tables
 
-    with TaskGroup(group_id="migrate_information") as transfer_tasks_group:
+    with TaskGroup(group_id="transfer_data_intermediate_tables") as transfer_tasks_group:
         for table in table_names:
             transfer_task = GenericTransfer(
                 task_id=f'migrate_from_{table}',
@@ -114,7 +114,8 @@ def migrate_information():
 
 
 with DAG(
-        dag_id='test_transfer_to_dds',
+        dag_id='init_dds_schema',
+        description='Создание dds схемы со связями и перенос предобработанных данных',
         schedule_interval=None,
         default_args=default_args,
 ) as dag:
@@ -125,7 +126,7 @@ with DAG(
     )
 
     migrate_sotrudniki = GenericTransfer(
-        task_id=f'migrate_from_сотрудники_дар',
+        task_id=f'migrate_table_сотрудники_дар',
         sql=f"""SELECT * FROM {source_schema_name}.сотрудники_дар;""",
         source_conn_id=target_conn_id,
         destination_conn_id=target_conn_id,
@@ -134,23 +135,20 @@ with DAG(
         dag=dag
     )
 
-    extract_and_insert_tables = PythonOperator(
-        task_id='migrate_tables_16',
-        python_callable=migrate_tables_16,
+    create_end_tables_in_schema = PythonOperator(
+        task_id='create_end_tables_in_schema',
+        python_callable=create_end_tables,
         dag=dag
     )
 
-    transfer_tasks_group = migrate_other_tables()
-
-    # создали таблицу
-    test_create_dds_table = PythonOperator(
-        task_id='test_create_dds_table',
-        python_callable=migrate,
+    create_intermediate_tables_in_schema = PythonOperator(
+        task_id='create_intermediate_tables_in_schema',
+        python_callable=create_intermediate_tables,
         dag=dag
     )
 
-    # transfer_broken_resume = PostgresOperator(
-    #     task_id='transfer_broken_resume',
+    # transfer_broken_data = PostgresOperator(
+    #     task_id='transfer_broken_data',
     #     postgres_conn_id=target_conn_id,
     #     sql=f"""
     #         INSERT INTO {broken_data_schema_name}.{table}
@@ -160,6 +158,4 @@ with DAG(
     #         """
     # )
 
-    migrate_resume = migrate_information()
-
-    create_schema >> migrate_sotrudniki >> extract_and_insert_tables >> transfer_tasks_group >> test_create_dds_table >> migrate_resume
+    create_schema >> migrate_sotrudniki >> create_end_tables_in_schema >> transfer_data_end_tables() >> create_intermediate_tables_in_schema >> transfer_data_intermediate_tables()

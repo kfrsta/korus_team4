@@ -71,7 +71,7 @@ def load_and_process_data():
 
 
 with DAG(
-        dag_id='pandas_processing_dag',
+        dag_id='transfer_data_intermediate_tables',
         default_args=default_args,
         description='Обработка и перенос данных из промежуточных таблиц',
         schedule_interval=None,

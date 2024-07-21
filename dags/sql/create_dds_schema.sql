@@ -18,9 +18,3 @@ CREATE TABLE IF NOT EXISTS dvyacheslav_dds.сотрудники_дар (
     компания text,
     город_проживания text
 );
-
---CREATE TABLE IF NOT EXISTS dvyacheslav_dds.резюмедар (
---    user_id int4,
---    resume_id int4 PRIMARY KEY,
---    FOREIGN KEY (user_id) REFERENCES dvyacheslav_dds.сотрудники_дар (user_id)
---);

@@ -51,7 +51,7 @@ with DAG(
         в схемы broken_data и intermediate''',
         schedule_interval=None,
 ) as dag:
-    process_data_task = PythonOperator(
+    migrate_education = PythonOperator(
         task_id='migrate_education',
         python_callable=load_and_process_data,
         dag=dag,
