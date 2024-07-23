@@ -34,7 +34,7 @@ def create_end_tables():
                 s = f"""CREATE TABLE IF NOT EXISTS {target_schema_name}.{table} (
                 "id" int4 PRIMARY KEY, 
                 "название" character varying
-                );"""  # возможно, здесь не стоит указывать PRIMARY KEY
+                );"""
 
                 target_cur.execute(s)
 
