@@ -121,8 +121,10 @@ def taskflow():
             if 'подразделения' in df.columns:
                 df['подразделения'] = df['подразделения'].apply(lambda x: re.sub(r'[^a-zA-Zа-яА-Я\s\/]', '', str(x)))
             if 'год_сертификата' in df.columns:
+                existing_users = pd.read_sql_table(table_name="сотрудники_дар", con=conn, schema="andronov_ods")['id'].unique()
+                df = df[df['user_id'].isin(existing_users)]
                 df['год_сертификата'] = df['год_сертификата'].fillna(-1)
-                df = df[(df['год_сертификата'].astype(int) >= 1990) & (df['год_сертификата'].astype(int) <= datetime.now().year) & (df['год_сертификата'] == '')]
+                df = df[(df['год_сертификата'].astype(int) >= 1990) & (df['год_сертификата'].astype(int) <= datetime.now().year) & (df['год_сертификата'] != '')]
                 df_broken = df[(df['год_сертификата'].astype(int) < 1990) | (df['год_сертификата'].astype(int) > datetime.now().year) | (df['год_сертификата'] == '')]
                 df_broken.to_sql(name=table, con=conn, if_exists='append', schema="andronov_broken", index=False)
             df.to_sql(name=table, con=conn, if_exists='append',schema="andronov_dds", index=False)
@@ -139,11 +141,10 @@ def taskflow():
                        "языки_пользователей": ["язык", "уровень_знаний_ин_языка"], "языки_программирования_и_уровень": ["уровень_знаний", "языки_программирования"]}
         conn = target_hook.get_sqlalchemy_engine()
 
-        existing_users = pd.read_sql_table(table_name="сотрудники_дар", con=conn, schema="andronov_dds")['id'].unique()
+        existing_users = pd.read_sql_table(table_name="сотрудники_дар", con=conn, schema="andronov_ods")['id'].unique()
 
         for table in base_tables.keys():
-            df = pd.read_sql_table(
-                table_name=table, con=conn, schema="andronov_ods")
+            df = pd.read_sql_table(table_name=table, con=conn, schema="andronov_ods")
             if 'название' in df.columns:
                 df = df[df['название'].str.contains('User:')]
                 df['название'] = df['название'].apply(lambda x: x.replace('User:', '')).astype(int)
@@ -158,12 +159,35 @@ def taskflow():
             df_broken = df[df.apply(lambda x: any(x == ''), axis=1)]
             for column in base_tables[table]:
                 df_cleaned[column] = df_cleaned[column].str.extract(r'\[(\d+)\]').astype(int)
+            df = df.drop_duplicates(subset=['user_id']+base_tables[table])
             df_cleaned = df_cleaned[df_cleaned['user_id'].isin(existing_users)]
             df_cleaned.to_sql(name=table, con=conn, if_exists='append', schema="andronov_dds", index=False)
             if len(df_broken) > 0:
                 df_broken = df_broken[~df_broken['user_id'].isin(existing_users)]
                 df_broken.to_sql(name=table, con=conn, if_exists='append', schema="andronov_broken", index=False)
             logging.info(f"Loaded table {table}")
+
+    @task 
+    def create_dm_schema():
+        try:
+            scr_path = "/opt/airflow/scr/sql/create_schema_dm.sql"
+            with open(scr_path, "r") as file:
+                sql_query = file.read()
+            target_hook = PostgresHook(postgres_conn_id="etl_db_4_conn")
+            target_hook.run(sql_query)
+        except Exception as e:
+            raise AirflowException(f"Failed to create dm schema: {e}")
+    @task 
+    def load_data_dm():
+        try:
+            scr_path = "/opt/airflow/scr/sql/load_dds_to_dm.sql"
+            with open(scr_path, "r") as file:
+                sql_query = file.read()
+            target_hook = PostgresHook(postgres_conn_id="etl_db_4_conn")
+            target_hook.run(sql_query)
+        except Exception as e:
+            raise AirflowException(f"Failed to load_data schema: {e}")
+
 
 
     t1 = load_data_to_ods()
@@ -172,8 +196,10 @@ def taskflow():
     t4 = process_load_dds_measurments_tables()
     t5 = process_load_dds_extra_tables()
     t6 = process_load_dds_base_tables()
+    t7 = create_dm_schema()
+    t8 = load_data_dm()
 
-    t1 >> t2 >> t3 >> t4 >> t5 >> t6
+    t1 >> t2 >> t3 >> t4 >> t5 >> t6 >> t7 >> t8
 
 
 main_dag = taskflow()
