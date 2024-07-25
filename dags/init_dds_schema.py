@@ -33,7 +33,7 @@ def create_end_tables():
             for table in table_names:
                 s = f"""CREATE TABLE IF NOT EXISTS {target_schema_name}.{table} (
                 "id" int4 PRIMARY KEY, 
-                "название" character varying
+                "название" varchar(100)
                 );"""
 
                 target_cur.execute(s)
@@ -135,13 +135,13 @@ with DAG(
         dag=dag
     )
 
-    create_end_tables_in_schema = PythonOperator(
+    create_end_tables = PythonOperator(
         task_id='create_end_tables_in_schema',
         python_callable=create_end_tables,
         dag=dag
     )
 
-    create_intermediate_tables_in_schema = PythonOperator(
+    create_intermediate_tables = PythonOperator(
         task_id='create_intermediate_tables_in_schema',
         python_callable=create_intermediate_tables,
         dag=dag
@@ -158,4 +158,4 @@ with DAG(
     #         """
     # )
 
-    create_schema >> migrate_sotrudniki >> create_end_tables_in_schema >> transfer_data_end_tables() >> create_intermediate_tables_in_schema >> transfer_data_intermediate_tables()
+    create_schema >> migrate_sotrudniki >> create_end_tables >> transfer_data_end_tables() >> create_intermediate_tables >> transfer_data_intermediate_tables()

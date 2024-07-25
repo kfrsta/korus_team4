@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS dvyacheslav_dds.сотрудники_дар (
     пол text,
     фамилия text,
     имя text,
-    последняя_авторизация text,
+    последняя_авторизация TIMESTAMP,
     должность text,
     цфо text,
     дата_регистрации text,
