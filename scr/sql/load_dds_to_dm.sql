@@ -1,8 +1,8 @@
-TRUNCATE TABLE andronov_dm.dim_users;
-TRUNCATE TABLE andronov_dm.dim_knowledge_level;
-TRUNCATE TABLE andronov_dm.skills;
-TRUNCATE TABLE andronov_dm.fact_employee_skills;
-TRUNCATE TABLE andronov_dm.fact_employee_sertificate;
+TRUNCATE TABLE andronov_dm.dim_users CASCADE;
+TRUNCATE TABLE andronov_dm.dim_knowledge_level CASCADE;
+TRUNCATE TABLE andronov_dm.skills CASCADE;
+TRUNCATE TABLE andronov_dm.fact_employee_skills CASCADE;
+TRUNCATE TABLE andronov_dm.fact_employee_sertificate CASCADE;
 
 INSERT INTO andronov_dm.dim_users (user_id, имя, фамилия, логин, email, дата_рождения, активность, город_проживания, компания, подразделения, цфо, должность, пол)
 SELECT 
