@@ -1,5 +1,3 @@
-CREATE SCHEMA IF NOT EXISTS dvyacheslav_dm;
-
 CREATE TABLE IF NOT EXISTS dvyacheslav_dm.skills (
     skill_id int4 PRIMARY KEY,
     название VARCHAR(100) NOT NULL,
@@ -13,21 +11,13 @@ CREATE TABLE IF NOT EXISTS dvyacheslav_dm.knowledge_levels (
 
 CREATE TABLE IF NOT EXISTS dvyacheslav_dm.users (
 	user_id int4 PRIMARY KEY,
-	дата_рождения text NULL,
-	активность text NULL,
-	пол text NULL,
-	фамилия text NULL,
-	имя text NULL,
-	последняя_авторизация TIMESTAMP,
-	должность text NULL,
-	цфо text NULL,
-	дата_регистрации text NULL,
-	дата_изменения text NULL,
-	подразделения text NULL,
-	"e-mail" text NULL,
-	логин text NULL,
-	компания text NULL,
-	город_проживания text NULL
+	активность VARCHAR(50),
+    фамилия VARCHAR(25),
+    имя VARCHAR(25),
+    последняя_авторизация TIMESTAMP,
+    должность VARCHAR(50),
+    цфо VARCHAR(100),
+    подразделения VARCHAR(200)
 );
 
 CREATE TABLE IF NOT EXISTS dvyacheslav_dm.fact_employee_skills (

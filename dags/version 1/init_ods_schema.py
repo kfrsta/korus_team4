@@ -1,7 +1,11 @@
 import datetime as dt
+import sys
 
+sys.path.append("/opt/airflow/utils")
+
+from tables import all_tables
 from airflow import DAG
-from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from airflow.operators.python import PythonOperator
 from airflow.operators.generic_transfer import GenericTransfer
 from airflow.providers.postgres.hooks.postgres import PostgresHook
@@ -22,22 +26,13 @@ def create_tables():
     source_hook = PostgresHook(postgres_conn_id=source_conn_id)
     source_cur = source_hook.get_conn().cursor()
 
-    query = f"""
-            SELECT table_name
-            FROM information_schema.tables
-            WHERE table_schema = '{source_schema_name}'
-            """
-
-    source_cur.execute(query)
-    table_names = source_cur.fetchall()
+    table_names = all_tables
 
     target_hook = PostgresHook(postgres_conn_id=target_conn_id)
 
     with target_hook.get_conn() as conn:
         with conn.cursor() as target_cur:
-
             for table in table_names:
-                table = table[0]
                 query = f"""SELECT column_name, data_type
                 FROM information_schema.columns
                 WHERE table_name = '{table}';"""
@@ -45,30 +40,18 @@ def create_tables():
                 source_cur.execute(query)
                 data = source_cur.fetchall()
 
-                s = f"CREATE TABLE IF NOT EXISTS {target_schema_name}.{table} ("
-                for column_name, data_type in data:
-                    column_name = column_name.lower().replace(' ', '_')
-                    s += f'"{column_name}" {data_type}, '
-                create_table_query = s.rstrip(', ') + ');'
+                create_table_query = f"CREATE TABLE IF NOT EXISTS {target_schema_name}.{table} ("
+                create_table_query += ', '.join([f'"{column_name.lower().replace(" ", "_")}" {data_type}'
+                                                 for column_name, data_type in data]) + ');'
 
                 target_cur.execute(create_table_query)
 
 
 def transfer_data():
-    source_hook = PostgresHook(postgres_conn_id=source_conn_id)
-    source_cur = source_hook.get_conn().cursor()
-
-    query = f"""SELECT table_name
-                FROM information_schema.tables
-                WHERE table_schema = '{source_schema_name}'
-                """
-
-    source_cur.execute(query)
-    table_names = source_cur.fetchall()
+    table_names = all_tables
 
     with TaskGroup(group_id="transfer_tasks") as transfer_tasks_group:
         for table in table_names:
-            table = table[0]
             transfer_task = GenericTransfer(
                 task_id=f'transfer_{table}',
                 sql=f"SELECT * FROM {source_schema_name}.{table}",
@@ -87,10 +70,11 @@ with DAG(
         schedule_interval=None,
         default_args=default_args,
 ) as dag:
-    create_schema = PostgresOperator(
+    create_schema = SQLExecuteQueryOperator(
         task_id='create_schema',
-        sql='sql/create_ods_schema.sql',
-        postgres_conn_id=target_conn_id,
+        sql='sql/create_schema.sql',
+        params={"schema_name": target_schema_name},
+        conn_id=target_conn_id
     )
 
     create_tables_in_schema = PythonOperator(

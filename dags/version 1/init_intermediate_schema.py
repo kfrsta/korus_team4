@@ -6,7 +6,7 @@ sys.path.append("/opt/airflow/utils")
 import pandas as pd
 from tables import end_tables, intermediate_tables, names_of_keys_in_the_table
 from airflow import DAG
-from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from sqlalchemy.types import Integer, String, Date, DateTime
@@ -36,11 +36,11 @@ def migrate_sotrudniki():
         df_without_missing = df[
             (df['последняя_авторизация'] != "") & (df['должность'] != "") & (df['должность'] != "-") & (
                     df['цфо'] != "")]
-        # Сохранение DataFrame с пропусками в отдельную схему в базе данных
+        # Сохранение DataFrame 'сотрудники_дар' с пропусками в отдельную схему в базе данных
         df_with_missing.to_sql(name=table, con=connection,
                                schema=broken_data_schema_name, if_exists='replace',
                                index=False)
-        # Сохранение DataFrame без пропусков в другую схему в базе данных
+        # Сохранение DataFrame 'сотрудники_дар' без пропусков в intermediate схему в базе данных
         df_without_missing.to_sql(name=table, con=connection,
                                   schema=target_schema_name, if_exists='replace',
                                   dtype={'user_id': Integer, 'последняя_авторизация': DateTime},
@@ -130,10 +130,18 @@ with DAG(
         schedule_interval=None,
         default_args=default_args,
 ) as dag:
-    create_schema = PostgresOperator(
+    create_intermediate_schema = SQLExecuteQueryOperator(
         task_id='create_intermediate_schema',
-        sql='sql/create_intermediate_schema.sql',
-        postgres_conn_id=target_conn_id,
+        sql='sql/create_schema.sql',
+        params={"schema_name": target_schema_name},
+        conn_id=target_conn_id
+    )
+
+    create_broken_schema = SQLExecuteQueryOperator(
+        task_id='create_broken_schema',
+        sql='sql/create_schema.sql',
+        params={"schema_name": broken_data_schema_name},
+        conn_id=target_conn_id
     )
 
     migrate_sotrudniki = PythonOperator(
@@ -154,4 +162,4 @@ with DAG(
         dag=dag,
     )
 
-    create_schema >> migrate_sotrudniki >> migrate_end >> migrate_intermediate
+    create_intermediate_schema >> create_broken_schema >> migrate_sotrudniki >> migrate_end >> migrate_intermediate

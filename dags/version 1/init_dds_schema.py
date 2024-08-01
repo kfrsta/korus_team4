@@ -121,7 +121,7 @@ with DAG(
 ) as dag:
     create_schema = PostgresOperator(
         task_id='create_dds_schema',
-        sql='sql/create_dds_schema.sql',
+        sql='sql/create_intermediate_tables_in_dds.sql',
         postgres_conn_id=target_conn_id,
     )
 

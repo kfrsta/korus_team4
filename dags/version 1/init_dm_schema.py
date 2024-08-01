@@ -21,7 +21,7 @@ with DAG(
 ) as dag:
     create_schema_and_tables = PostgresOperator(
         task_id='create_dm_schema_and_tables',
-        sql='sql/create_dm_schema.sql',
+        sql='sql/create_tables_in_dm_schema.sql',
         postgres_conn_id=target_conn_id,
     )
 
